@@ -1,0 +1,24 @@
+.story-box {
+  margin-top: 40px;
+  padding: 30px;
+  background: linear-gradient(180deg, #fffaf0, #eef3ff);
+  border-radius: 20px;
+  border: 3px dashed #b8d1ff;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+  font-family: Georgia, serif;
+}
+
+.story-box h2 {
+  margin-bottom: 15px;
+  color: #4a5cff;
+}
+
+#storyText {
+  white-space: pre-line;
+  line-height: 1.7;
+  font-size: 1.05rem;
+}
+
+.hidden {
+  display: none;
+}

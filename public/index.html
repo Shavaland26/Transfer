@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Wo Fantasie lebendig wird</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Verspielte, hochwertige Schrift -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* =======================
+         GRUNDLAYOUT & HINTERGRUND
+         ======================= */
+
+      body {
+        margin: 0;
+        font-family: "Comic Neue", "Trebuchet MS", system-ui, sans-serif;
+        background-color: #cce7ff;
+        background-image:
+          url("data:image/svg+xml;utf8,\
+          <svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'>\
+            <path d='M10 70 C45 25, 95 115, 130 70' stroke='%23b8d1ff' stroke-width='3' fill='none' opacity='0.35'/>\
+            <circle cx='40' cy='35' r='2' fill='%23ffffff' opacity='0.5'/>\
+            <circle cx='100' cy='90' r='2' fill='%23ffffff' opacity='0.5'/>\
+          </svg>");
+        background-repeat: repeat;
+        min-height: 100vh;
+      }
+
+      #app {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 60px 20px 100px;
+        position: relative;
+      }
+
+      /* =======================
+         DEKORATIVE ELEMENTE
+         ======================= */
+
+      .cloud {
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+        opacity: 0.55;
+        filter: blur(1px);
+      }
+
+      .cloud.one {
+        width: 200px;
+        height: 70px;
+        top: 40px;
+        left: -70px;
+      }
+
+      .cloud.two {
+        width: 260px;
+        height: 90px;
+        top: 160px;
+        right: -90px;
+      }
+
+      /* =======================
+         POETISCHE ÜBERSCHRIFT
+         ======================= */
+
+      .headline {
+        text-align: center;
+        font-size: 3.2rem;
+        line-height: 1.2;
+        color: #3a5ba0;
+        margin-bottom: 14px;
+      }
+
+      .headline span {
+        display: block;
+        font-size: 1.6rem;
+        margin-top: 10px;
+        color: #ff9f43;
+        font-weight: 700;
+      }
+
+      .subline {
+        text-align: center;
+        font-size: 1.1rem;
+        color: #4b5563;
+        margin-bottom: 40px;
+      }
+
+      /* =======================
+         FORMULAR
+         ======================= */
+
+      form {
+        background: rgba(255, 255, 255, 0.93);
+        border-radius: 30px;
+        padding: 36px;
+        box-shadow: 0 24px 50px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(4px);
+      }
+
+      h2 {
+        margin-top: 40px;
+        color: #4b7bec;
+      }
+
+      label {
+        font-weight: 700;
+        color: #333;
+        display: block;
+        background: linear-gradient(
+          to right,
+          rgba(255, 255, 255, 0.75),
+          rgba(255, 255, 255, 0)
+        );
+        padding: 10px 12px;
+        border-radius: 16px;
+        margin-bottom: 14px;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px 12px;
+        margin-top: 6px;
+        border-radius: 14px;
+        border: 2px solid #dde6f0;
+        font-size: 1rem;
+        font-family: inherit;
+        background: #ffffff;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #7aa2ff;
+        box-shadow: 0 0 0 3px rgba(122, 162, 255, 0.25);
+      }
+
+      fieldset {
+        border: 2px dashed #b8d1ff;
+        border-radius: 20px;
+        padding: 16px;
+        margin-top: 10px;
+      }
+
+      legend {
+        padding: 0 12px;
+        color: #4b7bec;
+        font-weight: 700;
+      }
+
+      /* =======================
+         ABENTEUER-TRENNER
+         ======================= */
+
+      .divider {
+        margin: 45px 0;
+        opacity: 0.85;
+      }
+
+      /* =======================
+         BUTTONS
+         ======================= */
+
+      button {
+        background: linear-gradient(135deg, #ffb347, #ff6f61);
+        color: white;
+        border: none;
+        border-radius: 999px;
+        padding: 14px 32px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 30px rgba(0, 0, 0, 0.22);
+      }
+
+      button::after {
+        content: "";
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        width: 16px;
+        height: 16px;
+        background: #ffd166;
+        border-radius: 50%;
+        opacity: 0.6;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <div class="cloud one"></div>
+      <div class="cloud two"></div>
+    </div>
+
+    <script type="module" src="/main.js"></script>
+
+  </body>
+</html>
