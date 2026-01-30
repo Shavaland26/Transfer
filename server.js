@@ -200,28 +200,22 @@ function normalizeOutfit(outfit = {}) {
   };
 
   const colorMap = {
-    rot: "rot",
-    blau: "blau",
-    grün: "grün",
-    gelb: "gelb",
-    weiß: "weiß",
-    schwarz: "schwarz",
-    grau: "grau",
+    rot: "rote",
+    blau: "blaue",
+    grün: "grüne",
+    gelb: "gelbe",
+    weiß: "weiße",
+    schwarz: "schwarze",
+    grau: "graue",
   };
 
   const topType = topMap[outfit.topType] || "Oberteil";
-  const topColor = colorMap[outfit.topColor] || "neutral";
-  const pantsColor = colorMap[outfit.pantsColor] || "neutral";
+  const topColor = colorMap[outfit.topColor] || "neutrale";
+  const pantsColor = colorMap[outfit.pantsColor] || "neutrale";
 
-  return `${topColores(topColor)}s ${topType} und eine ${pantsColor}e Hose`;
+  return `${topColor} ${topType} und eine ${pantsColor} Hose`;
 }
 
-// kleine Grammatik-Hilfe
-function topColores(color) {
-  if (color.endsWith("u")) return color; // blau
-  if (color.endsWith("ß")) return color;
-  return color;
-}
 
 function buildImagePrompt({ pageText, child, tone, animationStyle }) {
   const s = animationStyle?.toLowerCase().trim();
