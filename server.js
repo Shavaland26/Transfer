@@ -191,6 +191,37 @@ Visible paper texture, soft brush strokes, gentle color washes.
 2D cartoon animation frame, clean linework, simple shapes, clear colors.
 `.trim();
 }
+function normalizeOutfit(outfit = {}) {
+  if (!outfit) return "ein neutrales, schlichtes Outfit";
+
+  const topMap = {
+    tshirt: "T-Shirt",
+    hoodie: "Hoodie",
+  };
+
+  const colorMap = {
+    rot: "rot",
+    blau: "blau",
+    grün: "grün",
+    gelb: "gelb",
+    weiß: "weiß",
+    schwarz: "schwarz",
+    grau: "grau",
+  };
+
+  const topType = topMap[outfit.topType] || "Oberteil";
+  const topColor = colorMap[outfit.topColor] || "neutral";
+  const pantsColor = colorMap[outfit.pantsColor] || "neutral";
+
+  return `${topColores(topColor)}s ${topType} und eine ${pantsColor}e Hose`;
+}
+
+// kleine Grammatik-Hilfe
+function topColores(color) {
+  if (color.endsWith("u")) return color; // blau
+  if (color.endsWith("ß")) return color;
+  return color;
+}
 
 function buildImagePrompt({ pageText, child, tone, animationStyle }) {
   const s = animationStyle?.toLowerCase().trim();
