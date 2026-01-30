@@ -464,3 +464,10 @@ app.post("/api/image", async (req, res) => {
     await new Promise((r) => setTimeout(r, IMAGE_DELAY_MS));
   });
 });
+/* =========================
+   START SERVER
+========================= */
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`✅ Server läuft auf Port ${PORT}`);
+});
