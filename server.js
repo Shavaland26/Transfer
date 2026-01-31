@@ -6,7 +6,6 @@ import cors from "cors";
 import fs from "fs";
 import path from "path";
 import OpenAI from "openai";
-import fetch from "node-fetch";
 import FormData from "form-data";
 
 
