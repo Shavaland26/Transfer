@@ -307,16 +307,7 @@
     /* =========================
        IMAGE QUEUE (SAUBER)
     ========================= */
-   async function startImageQueue(runId) {
-  console.log(
-    "START IMAGE QUEUE",
-    "pages:", pages.length,
-    "prompts:", imagePrompts.length,
-    "mainImagePath:", mainImagePath
-  );
-  ...
-}
-
+  
     async function startImageQueue(runId) {
       for (let i = 0; i < imagePrompts.length; i++) {
         if (runId !== queueRunId) return;
