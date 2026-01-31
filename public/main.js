@@ -312,15 +312,17 @@
       for (let i = 0; i < imagePrompts.length; i++) {
         if (runId !== queueRunId) return;
         if (images[i]) continue;
+        
+console.log("Frontend mainImagePath:", mainImagePath);
 
         try {
           const res = await fetch("/api/image", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              prompt: imagePrompts[i],
-              referenceImage: mainImagePath,
-            }),
+  prompt: imagePrompts[i],
+  mainImagePath: mainImagePath,
+}),
           });
 
           const data = await res.json();
