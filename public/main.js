@@ -354,12 +354,25 @@ console.log("Frontend mainImagePath:", mainImagePath);
       }
     }
 
-    /* =========================
-      function renderPage() {
-  // Absicherung: Story oder Seite noch nicht bereit
-  if (!pages || !pages.length || pages[currentPage] == null) {
-    return;
-  }
+  /* =========================
+   RENDER
+========================= */
+
+function renderPage() {
+  if (!pages || !pages.length || pages[currentPage] == null) return;
+
+  storyPage.innerHTML = pages[currentPage]
+    .split("\n")
+    .map(p => `<p>${p}</p>`)
+    .join("");
+
+  pageCounter.textContent = `Seite ${currentPage + 1} von ${pages.length}`;
+
+  imageContainer.innerHTML = images[currentPage]
+    ? `<img src="${images[currentPage]}" style="max-width:100%;border-radius:12px;">`
+    : `<em>🕒 Bild wird generiert…</em>`;
+}
+
 
   storyPage.innerHTML = pages[currentPage]
     .split("\n")
@@ -436,6 +449,7 @@ console.log("Frontend mainImagePath:", mainImagePath);
 console.log("STORY LENGTH:", data.story?.length);
 console.log("IMAGE PROMPTS LENGTH:", data.imagePrompts?.length);
 console.log("MAIN IMAGE PATH:", data.mainImagePath);
+      currentPage = 0;
 
 
       mainImagePath = data.mainImagePath;
