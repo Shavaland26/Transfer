@@ -307,7 +307,12 @@
     /* =========================
        IMAGE QUEUE (SAUBER)
     ========================= */
-
+    console.log(
+  "START IMAGE QUEUE",
+  "pages:", pages.length,
+  "prompts:", imagePrompts.length,
+  "mainImagePath:", mainImagePath
+);
     async function startImageQueue(runId) {
       for (let i = 0; i < imagePrompts.length; i++) {
         if (runId !== queueRunId) return;
@@ -427,6 +432,11 @@ console.log("Frontend mainImagePath:", mainImagePath);
 
       const res = await fetch("/api/story", { method: "POST", body: formData });
       const data = await res.json();
+      console.log("STORY RESPONSE:", data);
+console.log("STORY LENGTH:", data.story?.length);
+console.log("IMAGE PROMPTS LENGTH:", data.imagePrompts?.length);
+console.log("MAIN IMAGE PATH:", data.mainImagePath);
+
 
       mainImagePath = data.mainImagePath;
       pages = data.story
