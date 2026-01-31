@@ -414,12 +414,12 @@ BEGINNE JETZT.
     });
 
     res.json({
-      success: true,
-      totalPages: pagesCount,
-      story: storyText,
-      Prompts,
-      mainPath,
-    });
+  success: true,
+  totalPages: pagesCount,
+  story: storyText,
+  imagePrompts: Prompts,
+  mainImagePath,
+});
 
   } catch (err) {
     console.error("❌ Story-Fehler:", err);
@@ -434,11 +434,11 @@ BEGINNE JETZT.
 let Queue = Promise.resolve();
 const _DELAY_MS = 15000;
 
-app.post("/api/", async (req, res) => {
+app.post("/api/image", async (req, res) => {
   Queue = Queue.then(async () => {
     try {
-      const { prompt, mainPath } = req.body || {};
-
+      const { prompt, mainImagePath } = req.body || {};
+       
       if (!prompt) {
         res.status(400).json({
           success: false,
@@ -466,9 +466,10 @@ app.post("/api/", async (req, res) => {
    const form = new FormData();
 
 // 🔑 Referenzbild (Node 18: Blob, kein Stream)
-const Buffer = fs.readFileSync(mainPath);
-const Blob = new Blob([Buffer], { type: "/png" });
-form.append("init_", Blob, "reference.png");
+const imageBuffer = fs.readFileSync(mainImagePath);
+const imageBlob = new Blob([imageBuffer], { type: "image/png" });
+form.append("init_image", imageBlob, "reference.png");
+
 
 // 🧠 Prompt
 form.append("text_prompts[0][text]", prompt);
@@ -491,13 +492,6 @@ const response = await fetch(
   }
 );
 
-if (!response.ok) {
-  const errText = await response.text();
-  console.error("❌ Stability API Fehler:", errText);
-  throw new Error("Stable Diffusion API Fehler");
-}
-
-
       if (!response.ok) {
         const errText = await response.text();
         console.error("❌ Stability API Fehler:", errText);
@@ -512,10 +506,9 @@ if (!response.ok) {
       }
 
       res.json({
-        success: true,
-        Base64: base64,
-      });
-
+  success: true,
+  imageBase64: base64,
+});
     } catch (err) {
       console.error("❌ -Fehler:", err);
       res.status(500).json({
