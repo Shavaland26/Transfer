@@ -476,24 +476,27 @@ form.append("text_prompts[0][weight]", "1");
 
 // ⚙️ Parameter
 form.append("cfg_scale", "7");
-form.append("_strength", "0.4");
+form.append("image_strength", "0.4");
 form.append("steps", "30");
 form.append("samples", "1");
 
 const response = await fetch(
-  "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/-to-",
+  "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/image-to-image",
   {
     method: "POST",
     headers: {
       Authorization: `Bearer ${process.env.STABILITY_API_KEY}`,
-      // ❗ KEINE Content-Type Header setzen
     },
     body: form,
   }
 );
 
-        }
-      );
+if (!response.ok) {
+  const errText = await response.text();
+  console.error("❌ Stability API Fehler:", errText);
+  throw new Error("Stable Diffusion API Fehler");
+}
+
 
       if (!response.ok) {
         const errText = await response.text();
