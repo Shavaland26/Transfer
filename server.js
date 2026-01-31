@@ -6,7 +6,6 @@ import cors from "cors";
 import fs from "fs";
 import path from "path";
 import OpenAI from "openai";
-import FormData from "form-data";
 
 
 const app = express();
@@ -46,7 +45,7 @@ const upload = multer({
     const extOk = allowed.test(path.extname(file.originalname).toLowerCase());
     const mimeOk = allowed.test(file.mimetype);
     if (extOk && mimeOk) return cb(null, true);
-    cb(new Error("Only images, PDFs, and text files are allowed!"));
+    cb(new Error("Only s, PDFs, and text files are allowed!"));
   },
 });
 
@@ -160,7 +159,7 @@ REGEL:
 
 
 /* =========================
-   HELPER – IMAGE PROMPT
+   HELPER –  PROMPT
 ========================= */
 
 function normStyle(style) {
@@ -221,7 +220,7 @@ function normalizeOutfit(outfit = {}) {
 }
 
 
-function buildImagePrompt({ pageText, child, tone, animationStyle }) {
+function buildPrompt({ pageText, child, tone, animationStyle }) {
   const s = animationStyle?.toLowerCase().trim();
   const isLego = s === "lego";
 
@@ -277,7 +276,7 @@ VERBINDLICH:
 ========================= */
 
 app.get("/", (_req, res) => {
-  res.send("✅ Story & Image Server läuft");
+  res.send("✅ Story &  Server läuft");
 });
 
 /* =========================
@@ -286,8 +285,8 @@ app.get("/", (_req, res) => {
 
 app.post("/api/story", upload.any(), async (req, res) => {
   try {
-    const mainImageFile = (req.files || []).find((f) => f.fieldname === "mainImage");
-    const mainImagePath = mainImageFile ? mainImageFile.path : null;
+    const mainFile = (req.files || []).find((f) => f.fieldname === "main");
+    const mainPath = mainFile ? mainFile.path : null;
 
     if (!req.body.storyData) {
       return res.status(400).json({ success: false, message: "storyData fehlt" });
@@ -393,8 +392,8 @@ BEGINNE JETZT.
     // 🔒 VISUAL IDENTITY ANCHOR – einmal pro Story erzeugen
     const visualAnchor = buildVisualAnchor();
 
-    const imagePrompts = storyPages.map((pageText, idx) => {
-      const p = buildImagePrompt({
+    const Prompts = storyPages.map((pageText, idx) => {
+      const p = buildPrompt({
         pageText,
         child: storyData.child,
         tone: storyData.story.tone,
@@ -404,7 +403,7 @@ BEGINNE JETZT.
 
       // Debug: nur Anfang loggen, damit Konsole nicht explodiert
       console.log(
-        "IMAGE PROMPT page",
+        " PROMPT page",
         idx + 1,
         "style =",
         storyData.style.animationStyle
@@ -418,8 +417,8 @@ BEGINNE JETZT.
       success: true,
       totalPages: pagesCount,
       story: storyText,
-      imagePrompts,
-      mainImagePath,
+      Prompts,
+      mainPath,
     });
 
   } catch (err) {
@@ -429,16 +428,16 @@ BEGINNE JETZT.
 });
 
 /* =========================
-   IMAGE ENDPOINT – STABLE DIFFUSION (IMAGE TO IMAGE)
+    ENDPOINT – STABLE DIFFUSION ( TO )
 ========================= */
 
-let imageQueue = Promise.resolve();
-const IMAGE_DELAY_MS = 15000;
+let Queue = Promise.resolve();
+const _DELAY_MS = 15000;
 
-app.post("/api/image", async (req, res) => {
-  imageQueue = imageQueue.then(async () => {
+app.post("/api/", async (req, res) => {
+  Queue = Queue.then(async () => {
     try {
-      const { prompt, mainImagePath } = req.body || {};
+      const { prompt, mainPath } = req.body || {};
 
       if (!prompt) {
         res.status(400).json({
@@ -448,7 +447,7 @@ app.post("/api/image", async (req, res) => {
         return;
       }
 
-      if (!mainImagePath || !fs.existsSync(mainImagePath)) {
+      if (!mainPath || !fs.existsSync(mainPath)) {
         res.status(400).json({
           success: false,
           message: "Referenzbild fehlt oder existiert nicht",
@@ -456,41 +455,43 @@ app.post("/api/image", async (req, res) => {
         return;
       }
 
-      console.log("🖼️ SDXL Image-to-Image gestartet");
+      console.log("🖼️ SDXL -to- gestartet");
       console.log(
         "PROMPT:",
         String(prompt).slice(0, 180).replace(/\s+/g, " "),
         "..."
       );
-      console.log("INIT IMAGE:", mainImagePath);
+      console.log("INIT :", mainPath);
 
-      const form = new FormData();
+   const form = new FormData();
 
-      // 🔑 Kundenbild als Referenz
-      form.append("init_image", fs.createReadStream(mainImagePath));
+// 🔑 Referenzbild (Node 18: Blob, kein Stream)
+const Buffer = fs.readFileSync(mainPath);
+const Blob = new Blob([Buffer], { type: "/png" });
+form.append("init_", Blob, "reference.png");
 
-      // 🧠 Prompt
-      form.append("text_prompts[0][text]", prompt);
-      form.append("text_prompts[0][weight]", "1");
+// 🧠 Prompt
+form.append("text_prompts[0][text]", prompt);
+form.append("text_prompts[0][weight]", "1");
 
-      // 🎯 Modell
-      form.append("model", "stable-diffusion-xl-1024-v1-0");
+// ⚙️ Parameter
+form.append("cfg_scale", "7");
+form.append("_strength", "0.4");
+form.append("steps", "30");
+form.append("samples", "1");
 
-      // ⚙️ Feintuning (bewusst konservativ)
-      form.append("cfg_scale", "7");
-      form.append("image_strength", "0.4"); // Identität bleibt erhalten
-      form.append("steps", "30");
-      form.append("samples", "1");
+const response = await fetch(
+  "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/-to-",
+  {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.STABILITY_API_KEY}`,
+      // ❗ KEINE Content-Type Header setzen
+    },
+    body: form,
+  }
+);
 
-      const response = await fetch(
-        "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/image-to-image",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.STABILITY_API_KEY}`,
-            ...form.getHeaders(),
-          },
-          body: form,
         }
       );
 
@@ -501,19 +502,19 @@ app.post("/api/image", async (req, res) => {
       }
 
       const result = await response.json();
-      const base64Image = result?.artifacts?.[0]?.base64;
+      const base64 = result?.artifacts?.[0]?.base64;
 
-      if (!base64Image) {
+      if (!base64) {
         throw new Error("Kein Bild von Stable Diffusion erhalten");
       }
 
       res.json({
         success: true,
-        imageBase64: base64Image,
+        Base64: base64,
       });
 
     } catch (err) {
-      console.error("❌ Image-Fehler:", err);
+      console.error("❌ -Fehler:", err);
       res.status(500).json({
         success: false,
         message: "Fehler bei der Bildgenerierung",
@@ -521,7 +522,7 @@ app.post("/api/image", async (req, res) => {
     }
 
     // ⏳ Queue Delay (Kosten + Stabilität)
-    await new Promise((r) => setTimeout(r, IMAGE_DELAY_MS));
+    await new Promise((r) => setTimeout(r, _DELAY_MS));
   });
 });
 
