@@ -6,6 +6,9 @@ import cors from "cors";
 import fs from "fs";
 import path from "path";
 import OpenAI from "openai";
+import fetch from "node-fetch";
+import FormData from "form-data";
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -427,16 +430,16 @@ BEGINNE JETZT.
 });
 
 /* =========================
-   IMAGE ENDPOINT (Queue + 20s)
+   IMAGE ENDPOINT – STABLE DIFFUSION (IMAGE TO IMAGE)
 ========================= */
 
 let imageQueue = Promise.resolve();
-const IMAGE_DELAY_MS = 20000;
+const IMAGE_DELAY_MS = 15000;
 
 app.post("/api/image", async (req, res) => {
   imageQueue = imageQueue.then(async () => {
     try {
-      const { prompt, style } = req.body || {};
+      const { prompt, mainImagePath } = req.body || {};
 
       if (!prompt) {
         res.status(400).json({
@@ -446,37 +449,68 @@ app.post("/api/image", async (req, res) => {
         return;
       }
 
+      if (!mainImagePath || !fs.existsSync(mainImagePath)) {
+        res.status(400).json({
+          success: false,
+          message: "Referenzbild fehlt oder existiert nicht",
+        });
+        return;
+      }
+
+      console.log("🖼️ SDXL Image-to-Image gestartet");
       console.log(
-        "IMAGE prompt head:",
-        String(prompt).slice(0, 160).replace(/\s+/g, " "),
+        "PROMPT:",
+        String(prompt).slice(0, 180).replace(/\s+/g, " "),
         "..."
       );
-      console.log("IMAGE style:", style);
+      console.log("INIT IMAGE:", mainImagePath);
 
-      let image;
+      const form = new FormData();
 
-      if (style === "lego") {
-        image = await openai.images.generate({
-          model: "gpt-image-1",
-          prompt,
-          size: "1024x1024",
-          quality: "high",
-          image: fs.createReadStream(
-            "./style-anchors/lego/ninjago_reference.jpg"
-          ),
-        });
-      } else {
-        image = await openai.images.generate({
-          model: "gpt-image-1",
-          prompt,
-          size: "1024x1024",
-          quality: "high",
-        });
+      // 🔑 Kundenbild als Referenz
+      form.append("init_image", fs.createReadStream(mainImagePath));
+
+      // 🧠 Prompt
+      form.append("text_prompts[0][text]", prompt);
+      form.append("text_prompts[0][weight]", "1");
+
+      // 🎯 Modell
+      form.append("model", "stable-diffusion-xl-1024-v1-0");
+
+      // ⚙️ Feintuning (bewusst konservativ)
+      form.append("cfg_scale", "7");
+      form.append("image_strength", "0.4"); // Identität bleibt erhalten
+      form.append("steps", "30");
+      form.append("samples", "1");
+
+      const response = await fetch(
+        "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/image-to-image",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.STABILITY_API_KEY}`,
+            ...form.getHeaders(),
+          },
+          body: form,
+        }
+      );
+
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error("❌ Stability API Fehler:", errText);
+        throw new Error("Stable Diffusion API Fehler");
+      }
+
+      const result = await response.json();
+      const base64Image = result?.artifacts?.[0]?.base64;
+
+      if (!base64Image) {
+        throw new Error("Kein Bild von Stable Diffusion erhalten");
       }
 
       res.json({
         success: true,
-        imageBase64: image.data?.[0]?.b64_json,
+        imageBase64: base64Image,
       });
 
     } catch (err) {
@@ -487,10 +521,11 @@ app.post("/api/image", async (req, res) => {
       });
     }
 
-    // harte Pause: 1 Bild alle 20 Sekunden
+    // ⏳ Queue Delay (Kosten + Stabilität)
     await new Promise((r) => setTimeout(r, IMAGE_DELAY_MS));
   });
 });
+
 /* =========================
    START SERVER
 ========================= */
