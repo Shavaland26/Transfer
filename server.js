@@ -286,7 +286,7 @@ app.get("/", (_req, res) => {
 app.post("/api/story", upload.any(), async (req, res) => {
   try {
     const mainFile = (req.files || []).find((f) => f.fieldname === "main");
-    const mainPath = mainFile ? mainFile.path : null;
+    const mainImagePath = mainFile ? mainFile.path : null;
 
     if (!req.body.storyData) {
       return res.status(400).json({ success: false, message: "storyData fehlt" });
