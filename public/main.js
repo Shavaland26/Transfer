@@ -331,7 +331,7 @@ console.log("Frontend mainImagePath:", mainImagePath);
           });
 
           const data = await res.json();
-          currentPage = 0;
+        
 
           if (data?.imageUrl) {
             images[i] = data.imageUrl;
@@ -457,7 +457,6 @@ console.log("MAIN IMAGE PATH:", data.mainImagePath);
   .split(/Seite\s+\d+:\s*/)
   .map(p => p.trim())
   .filter(p => p.length > 0);
-currentPage = 0;
       imagePrompts = data.imagePrompts;
       images = new Array(imagePrompts.length).fill(null);
 
