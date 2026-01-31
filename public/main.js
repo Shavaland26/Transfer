@@ -307,12 +307,16 @@
     /* =========================
        IMAGE QUEUE (SAUBER)
     ========================= */
-    console.log(
-  "START IMAGE QUEUE",
-  "pages:", pages.length,
-  "prompts:", imagePrompts.length,
-  "mainImagePath:", mainImagePath
-);
+   async function startImageQueue(runId) {
+  console.log(
+    "START IMAGE QUEUE",
+    "pages:", pages.length,
+    "prompts:", imagePrompts.length,
+    "mainImagePath:", mainImagePath
+  );
+  ...
+}
+
     async function startImageQueue(runId) {
       for (let i = 0; i < imagePrompts.length; i++) {
         if (runId !== queueRunId) return;
@@ -372,20 +376,6 @@ function renderPage() {
     ? `<img src="${images[currentPage]}" style="max-width:100%;border-radius:12px;">`
     : `<em>🕒 Bild wird generiert…</em>`;
 }
-
-
-  storyPage.innerHTML = pages[currentPage]
-    .split("\n")
-    .map(p => `<p>${p}</p>`)
-    .join("");
-
-  pageCounter.textContent = `Seite ${currentPage + 1} von ${pages.length}`;
-
-  imageContainer.innerHTML = images[currentPage]
-    ? `<img src="${images[currentPage]}" style="max-width:100%;border-radius:12px;">`
-    : `<em>🕒 Bild wird generiert…</em>`;
-}
-
 
     prevPageBtn.onclick = () => {
       if (currentPage > 0) {
